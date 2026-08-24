@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sabor Urbano — Menú digital premium
 
-## Getting Started
+Menú digital interactivo para restaurante (QR de mesa) con panel administrativo completo.
+Next.js 16 (App Router) + TypeScript + Tailwind + shadcn/ui + Framer Motion + Supabase (Postgres, Auth, Storage con RLS).
 
-First, run the development server:
+## Requisitos
+
+- Node.js 20+
+- Docker Desktop (para levantar Supabase localmente)
+
+## Puesta en marcha
 
 ```bash
+npm install
+
+# Levanta Postgres/Auth/Storage local en Docker (deja el proceso corriendo)
+npx supabase start
+
+# Copia las variables de entorno (los valores por defecto ya funcionan con `supabase start`)
+cp .env.local.example .env.local
+
+# Aplica el esquema y los datos demo
+npx supabase db reset
+
+# Crea el usuario administrador de prueba y vincúlalo al restaurante demo
+node scripts/seed-admin.mjs
+
+# Arranca la app
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre:
+- **http://localhost:3000/menu** — menú público
+- **http://localhost:3000/admin/login** — panel admin (`admin@saborurbano.com` / la contraseña que imprime `seed-admin.mjs`)
+- **http://127.0.0.1:54323** — Supabase Studio (ver tablas, Storage, Auth)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para detener Supabase local: `npx supabase stop`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estructura
 
-## Learn More
+```
+app/menu/…          rutas públicas del menú (Server Components)
+app/admin/…          panel administrativo (protegido por Supabase Auth)
+components/menu/      UI del menú público (cliente)
+components/admin/      UI del panel admin (cliente)
+components/ui/        primitivas shadcn/ui
+lib/services/         acceso a datos (Supabase, un archivo por dominio)
+lib/actions/           Server Actions ("use server") que llaman a los services
+lib/validation/         esquemas zod para los formularios
+lib/types/               tipos generados de la BD + tipos de dominio
+supabase/migrations/     esquema SQL versionado
+supabase/seed.sql         datos demo (restaurante, categorías, 20 platos)
+scripts/seed-admin.mjs     crea el usuario admin de prueba
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Comandos útiles
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev            # servidor de desarrollo (Turbopack)
+npm run build           # build de producción
+npm run lint             # ESLint
+npx tsc --noEmit          # chequeo de tipos
+npx supabase db reset      # reaplica migraciones + reseed (borra los datos actuales)
+npx supabase gen types typescript --local   # regenera lib/types/database.ts si cambias el esquema
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Desplegar a producción
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Crea un proyecto en [supabase.com](https://supabase.com), corre las migraciones de `supabase/migrations/` contra él (`npx supabase link` + `npx supabase db push`) y `supabase/seed.sql` si quieres los datos demo.
+2. Sube el código a un repositorio y despliega en [Vercel](https://vercel.com/new) (o similar).
+3. Configura las variables de entorno de `.env.local.example` con las credenciales de tu proyecto Supabase real y tu dominio en `NEXT_PUBLIC_SITE_URL`.
+4. Crea tu usuario admin real: `supabase.auth.admin.createUser(...)` + una fila en `restaurant_admins` (puedes adaptar `scripts/seed-admin.mjs`).
