@@ -28,19 +28,19 @@ export function ProductGallery({ images, productName }: { images: ProductImage[]
   }, [emblaApi, onSelect]);
 
   if (images.length === 0) {
-    return <div className="aspect-square w-full bg-muted" />;
+    return <div className="aspect-square w-full bg-muted sm:mx-auto sm:aspect-[4/3] sm:max-w-xl sm:rounded-3xl" />;
   }
 
   return (
     <>
-      <div className="relative">
+      <div className="relative sm:mx-auto sm:max-w-xl sm:overflow-hidden sm:rounded-3xl">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {images.map((image, i) => (
               <button
                 type="button"
                 key={image.id}
-                className="relative aspect-square w-full shrink-0"
+                className="relative aspect-square w-full shrink-0 sm:aspect-[4/3]"
                 onClick={() => {
                   setSelectedIndex(i);
                   setLightboxOpen(true);
@@ -52,7 +52,7 @@ export function ProductGallery({ images, productName }: { images: ProductImage[]
                   alt={image.alt_text ?? productName}
                   fill
                   priority={i === 0}
-                  sizes="(max-width: 640px) 100vw, 600px"
+                  sizes="(max-width: 640px) 100vw, 576px"
                   className="object-cover"
                 />
               </button>

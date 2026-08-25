@@ -13,10 +13,12 @@ import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { groupByParent } from "@/lib/menu-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { productFormSchema, type ProductFormValues } from "@/lib/validation/product";
 import { slugify } from "@/lib/slugify";
@@ -45,6 +47,7 @@ export function ProductForm({
 }) {
   const [isPending, startTransition] = useTransition();
   const [slugTouched, setSlugTouched] = useState(mode === "edit");
+  const { topLevel: topLevelCategories, childrenOf } = groupByParent(categories);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -153,7 +156,7 @@ export function ProductForm({
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-1.5">
               <Label htmlFor="price">Precio</Label>
-              <Input id="price" type="number" min={0} step={500} {...form.register("price", { valueAsNumber: true })} />
+              <Input id="price" type="number" min={0} step={1} {...form.register("price", { valueAsNumber: true })} />
             </div>
             <div className="space-y-1.5">
               <Label>Categoría</Label>
@@ -167,10 +170,17 @@ export function ProductForm({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">Sin categoría</SelectItem>
-                      {categories.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.icon} {c.name}
-                        </SelectItem>
+                      {topLevelCategories.map((parent) => (
+                        <SelectGroup key={parent.id}>
+                          <SelectItem value={parent.id}>
+                            {parent.icon} {parent.name}
+                          </SelectItem>
+                          {childrenOf(parent.id).map((child) => (
+                            <SelectItem key={child.id} value={child.id} className="pl-6">
+                              {child.icon} {child.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       ))}
                     </SelectContent>
                   </Select>

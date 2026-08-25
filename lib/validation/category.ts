@@ -9,6 +9,7 @@ export const categoryFormSchema = z.object({
   description: z.string().max(300),
   icon: z.string().max(8),
   is_active: z.boolean(),
+  parent_id: z.string().uuid().nullable(),
 });
 
 export type CategoryFormValues = z.infer<typeof categoryFormSchema>;

@@ -81,6 +81,11 @@ declare
   v_cat_sushi uuid;
   v_cat_pastas uuid;
   v_cat_postres uuid;
+  v_cat_bebidas uuid;
+  v_cat_limonadas uuid;
+  v_cat_jugos uuid;
+  v_cat_cervezas uuid;
+  v_cat_refajos uuid;
 
   v_tag_picante uuid;
   v_tag_vegetariano uuid;
@@ -142,6 +147,16 @@ begin
     (v_restaurant_id, 'Pastas', 'pastas', 'Pasta fresca hecha en casa', '🍝', 4) returning id into v_cat_pastas;
   insert into categories (restaurant_id, name, slug, description, icon, sort_order) values
     (v_restaurant_id, 'Postres', 'postres', 'El final perfecto', '🍰', 5) returning id into v_cat_postres;
+  insert into categories (restaurant_id, name, slug, description, icon, sort_order) values
+    (v_restaurant_id, 'Bebidas', 'bebidas', 'Para acompañar cada plato', '🥤', 6) returning id into v_cat_bebidas;
+  insert into categories (restaurant_id, parent_id, name, slug, description, icon, sort_order) values
+    (v_restaurant_id, v_cat_bebidas, 'Limonadas', 'limonadas', 'Limonadas naturales de la casa', '🍋', 0) returning id into v_cat_limonadas;
+  insert into categories (restaurant_id, parent_id, name, slug, description, icon, sort_order) values
+    (v_restaurant_id, v_cat_bebidas, 'Jugos naturales', 'jugos-naturales', 'Fruta fresca exprimida al momento', '🍊', 1) returning id into v_cat_jugos;
+  insert into categories (restaurant_id, parent_id, name, slug, description, icon, sort_order) values
+    (v_restaurant_id, v_cat_bebidas, 'Cervezas', 'cervezas', 'Selección nacional e importada', '🍺', 2) returning id into v_cat_cervezas;
+  insert into categories (restaurant_id, parent_id, name, slug, description, icon, sort_order) values
+    (v_restaurant_id, v_cat_bebidas, 'Refajos', 'refajos', 'La mezcla clásica colombiana', '🍹', 3) returning id into v_cat_refajos;
 
   -- --------------------------------------------------------------------------
   -- Tags & allergens
@@ -414,6 +429,56 @@ begin
   insert into product_tags (product_id, tag_id) values (v_product_id, v_tag_nuevo), (v_product_id, v_tag_lacteos);
   insert into product_allergens (product_id, allergen_id) values (v_product_id, v_all_lacteos), (v_product_id, v_all_gluten), (v_product_id, v_all_huevo);
 
+  -- ==========================================================================
+  -- BEBIDAS (Limonadas, Jugos naturales, Cervezas, Refajos)
+  -- ==========================================================================
+
+  insert into products (restaurant_id, category_id, name, slug, short_description, description, price, status, is_bestseller, spice_level, sort_order)
+  values (v_restaurant_id, v_cat_limonadas, 'Limonada Natural', 'limonada-natural',
+    'Limón fresco, hierbabuena y un toque de panela',
+    'Limonada preparada al momento con limón recién exprimido, hierbabuena fresca y un toque de panela.',
+    9000, 'published', true, 0, 0)
+  returning id into v_product_id;
+  perform seed_add_images(v_product_id, 'Limonada Natural', '3f5a3f', 'f2c879', array['Vista principal','Presentación completa']);
+  perform seed_add_ingredients(v_restaurant_id, v_product_id, array['Limón','Hierbabuena','Panela']);
+
+  insert into products (restaurant_id, category_id, name, slug, short_description, description, price, status, is_new, spice_level, sort_order)
+  values (v_restaurant_id, v_cat_limonadas, 'Limonada de Coco', 'limonada-de-coco',
+    'Cremosa, con leche de coco',
+    'Nuestra limonada natural batida con leche de coco para una versión cremosa y refrescante.',
+    12000, 'published', true, 0, 1)
+  returning id into v_product_id;
+  perform seed_add_images(v_product_id, 'Limonada de Coco', '2f4a2f', 'f2c879', array['Vista principal','Presentación completa']);
+  perform seed_add_ingredients(v_restaurant_id, v_product_id, array['Limón','Leche de coco','Panela']);
+  insert into product_tags (product_id, tag_id) values (v_product_id, v_tag_nuevo), (v_product_id, v_tag_lacteos);
+  insert into product_allergens (product_id, allergen_id) values (v_product_id, v_all_lacteos);
+
+  insert into products (restaurant_id, category_id, name, slug, short_description, description, price, status, spice_level, sort_order)
+  values (v_restaurant_id, v_cat_jugos, 'Jugo de Naranja', 'jugo-de-naranja',
+    'Exprimido al momento',
+    'Jugo de naranja 100% natural, exprimido al momento en punto de venta.',
+    8000, 'published', 0, 0)
+  returning id into v_product_id;
+  perform seed_add_images(v_product_id, 'Jugo de Naranja', 'b45309', 'f2c879', array['Vista principal']);
+  perform seed_add_ingredients(v_restaurant_id, v_product_id, array['Naranja']);
+
+  insert into products (restaurant_id, category_id, name, slug, short_description, description, price, status, spice_level, sort_order)
+  values (v_restaurant_id, v_cat_cervezas, 'Cerveza Club Colombia', 'cerveza-club-colombia',
+    'Botella 330ml, bien fría',
+    'Cerveza lager nacional, servida bien fría en botella de 330ml.',
+    10000, 'published', 0, 0)
+  returning id into v_product_id;
+  perform seed_add_images(v_product_id, 'Cerveza Club Colombia', '3f3226', 'f2c879', array['Vista principal']);
+
+  insert into products (restaurant_id, category_id, name, slug, short_description, description, price, status, is_bestseller, spice_level, sort_order)
+  values (v_restaurant_id, v_cat_refajos, 'Refajo Clásico', 'refajo-clasico',
+    'Cerveza con Colombiana, servido en jarra',
+    'La mezcla clásica colombiana de cerveza con gaseosa Colombiana, servida bien fría en jarra.',
+    14000, 'published', true, 0, 0)
+  returning id into v_product_id;
+  perform seed_add_images(v_product_id, 'Refajo Clásico', 'b45309', 'f2c879', array['Vista principal','Presentación completa']);
+  insert into product_tags (product_id, tag_id) values (v_product_id, v_tag_bestseller);
+
   -- --------------------------------------------------------------------------
   -- Promotion example
   -- --------------------------------------------------------------------------
@@ -429,7 +494,7 @@ begin
     'banner'
   );
 
-  raise notice 'Seed completado: restaurante % con 6 categorías y 20 platos', v_restaurant_id;
+  raise notice 'Seed completado: restaurante % con 11 categorías (6 principales + Bebidas y sus 4 subcategorías) y 25 platos', v_restaurant_id;
 end $$;
 
 -- Clean up seed-only helpers (idempotent — safe to leave, but keeps schema tidy)

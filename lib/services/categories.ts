@@ -41,6 +41,7 @@ export async function createCategory(input: {
   image_url?: string | null;
   icon?: string | null;
   sort_order?: number;
+  parent_id?: string | null;
 }): Promise<Category> {
   const supabase = await createClient();
   const { data, error } = await supabase.from("categories").insert(input).select().single();

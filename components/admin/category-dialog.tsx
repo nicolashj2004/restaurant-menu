@@ -18,6 +18,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { categoryFormSchema, type CategoryFormValues } from "@/lib/validation/category";
 import { slugify } from "@/lib/slugify";
 import { createCategoryAction, updateCategoryAction } from "@/lib/actions/categories";
@@ -27,14 +34,22 @@ export function CategoryDialog({
   open,
   onOpenChange,
   category,
+  categories,
+  initialParentId = null,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   category?: Category;
+  categories: Category[];
+  /** Preselects the parent when opening the dialog to create a new category (e.g. via a parent row's "add subcategory" action). Ignored when editing an existing category. */
+  initialParentId?: string | null;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [slugTouched, setSlugTouched] = useState(Boolean(category));
+
+  const hasChildren = category ? categories.some((c) => c.parent_id === category.id) : false;
+  const parentOptions = categories.filter((c) => c.parent_id === null && c.id !== category?.id);
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
@@ -44,6 +59,7 @@ export function CategoryDialog({
       description: category?.description ?? "",
       icon: category?.icon ?? "",
       is_active: category?.is_active ?? true,
+      parent_id: category?.parent_id ?? initialParentId,
     },
   });
 
@@ -55,6 +71,7 @@ export function CategoryDialog({
         description: category?.description ?? "",
         icon: category?.icon ?? "",
         is_active: category?.is_active ?? true,
+        parent_id: category?.parent_id ?? initialParentId,
       });
       // Resetting local UI state to match the dialog's imperative form.reset()
       // call above, not a reaction to reactive props.
@@ -70,6 +87,7 @@ export function CategoryDialog({
     formData.set("slug", values.slug);
     formData.set("description", values.description);
     formData.set("icon", values.icon);
+    formData.set("parent_id", values.parent_id ?? "none");
     if (values.is_active) formData.set("is_active", "on");
 
     startTransition(async () => {
@@ -124,6 +142,35 @@ export function CategoryDialog({
             <Label htmlFor="cat-description">Descripción (opcional)</Label>
             <Textarea id="cat-description" rows={2} {...form.register("description")} />
           </div>
+
+          {hasChildren ? (
+            <p className="rounded-xl border border-dashed px-4 py-3 text-xs text-muted-foreground">
+              Esta categoría tiene subcategorías, por eso no puede tener a su vez una categoría padre.
+            </p>
+          ) : (
+            <div className="space-y-1.5">
+              <Label>Categoría padre (opcional)</Label>
+              <Controller
+                control={form.control}
+                name="parent_id"
+                render={({ field }) => (
+                  <Select value={field.value ?? "none"} onValueChange={(v) => field.onChange(v === "none" ? null : v)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Sin categoría padre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sin categoría padre (nivel principal)</SelectItem>
+                      {parentOptions.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.icon} {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          )}
 
           <Controller
             control={form.control}

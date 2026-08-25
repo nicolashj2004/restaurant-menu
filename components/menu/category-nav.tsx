@@ -10,7 +10,10 @@ export function CategoryNav({ className }: { className?: string }) {
   const pathname = usePathname();
   const activeSlug = pathname.startsWith("/menu/") ? pathname.split("/")[2] : undefined;
 
-  const items = [{ slug: undefined, name: "Todo", icon: "🍽" }, ...categories.map((c) => ({ slug: c.slug, name: c.name, icon: c.icon }))];
+  const items = [
+    { slug: undefined, name: "Todo", icon: "🍽" },
+    ...categories.filter((c) => c.parent_id === null).map((c) => ({ slug: c.slug, name: c.name, icon: c.icon })),
+  ];
 
   return (
     <nav

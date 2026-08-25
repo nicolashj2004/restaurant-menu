@@ -40,9 +40,9 @@ export function ProductDetailView({ productSlug }: { productSlug: string }) {
 
   return (
     <div className="pb-10">
-      <div className="relative">
+      <div className="relative sm:mx-auto sm:max-w-xl sm:pt-6">
         <ProductGallery images={product.images} productName={product.name} />
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-3">
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-3 sm:top-6">
           <Link
             href={`/menu/${product.category?.slug ?? ""}`}
             className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm hover:bg-black/55"

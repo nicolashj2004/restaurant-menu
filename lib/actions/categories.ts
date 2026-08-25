@@ -17,12 +17,14 @@ async function requireSession() {
 }
 
 function parseCategoryForm(formData: FormData) {
+  const parentId = formData.get("parent_id");
   return categoryFormSchema.parse({
     name: formData.get("name"),
     slug: formData.get("slug"),
     description: formData.get("description") ?? "",
     icon: formData.get("icon") ?? "",
     is_active: formData.get("is_active") === "on",
+    parent_id: !parentId || parentId === "none" ? null : parentId,
   });
 }
 
