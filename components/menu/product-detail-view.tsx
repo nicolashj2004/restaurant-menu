@@ -10,10 +10,13 @@ import { ProductOptions } from "@/components/menu/product-options";
 import { FavoriteButton } from "@/components/menu/favorite-button";
 import { ShareButton } from "@/components/menu/share-button";
 import { RelatedProducts } from "@/components/menu/related-products";
-import { getRelatedProducts } from "@/lib/menu-utils";
+import { getRelatedProducts, groupByParent, seededShuffle } from "@/lib/menu-utils";
+
+/** Categories (by slug) treated as pairing suggestions in "Combínala con". */
+const COMBINE_WITH_SLUGS = ["entradas", "bebidas"];
 
 export function ProductDetailView({ productSlug }: { productSlug: string }) {
-  const { products, formatPrice, track } = useMenu();
+  const { products, categories, formatPrice, track } = useMenu();
   const product = products.find((p) => p.slug === productSlug);
 
   useEffect(() => {
@@ -34,9 +37,41 @@ export function ProductDetailView({ productSlug }: { productSlug: string }) {
   }
 
   const related = getRelatedProducts(product, products, 8);
-  const combineWith = products
-    .filter((p) => p.is_available && p.category_id !== product.category_id && p.id !== product.id)
-    .slice(0, 6);
+
+  const { childrenOf } = groupByParent(categories);
+  // One bucket per pairing group: Entradas, Bebidas (with its subcategories), and —
+  // if it isn't already one of those — the viewed dish's own section.
+  const bucketIdSets = COMBINE_WITH_SLUGS.map((slug) => {
+    const category = categories.find((c) => c.slug === slug && c.parent_id === null);
+    if (!category) return null;
+    return new Set([category.id, ...childrenOf(category.id).map((c) => c.id)]);
+  }).filter((s): s is Set<string> => s !== null);
+  if (product.category_id && !bucketIdSets.some((ids) => ids.has(product.category_id!))) {
+    bucketIdSets.push(new Set([product.category_id]));
+  }
+
+  // Shuffle each bucket's own items, then shuffle the bucket visiting order, both seeded
+  // by the product id — looks random and varies per dish, but stays identical between the
+  // server render and the client hydration (a real Math.random() would mismatch there).
+  const buckets = bucketIdSets
+    .map((ids, i) =>
+      seededShuffle(
+        products.filter(
+          (p) => p.is_available && p.id !== product.id && p.category_id !== null && ids.has(p.category_id)
+        ),
+        `${product.id}-${i}`
+      )
+    )
+    .filter((bucket) => bucket.length > 0);
+  const bucketOrder = seededShuffle(buckets, product.id);
+
+  const combineWith: typeof products = [];
+  for (let round = 0; combineWith.length < 6 && bucketOrder.some((b) => b[round]); round++) {
+    for (const bucket of bucketOrder) {
+      if (combineWith.length >= 6) break;
+      if (bucket[round]) combineWith.push(bucket[round]);
+    }
+  }
 
   return (
     <div className="pb-10">

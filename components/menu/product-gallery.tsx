@@ -53,7 +53,7 @@ export function ProductGallery({ images, productName }: { images: ProductImage[]
                   fill
                   priority={i === 0}
                   sizes="(max-width: 640px) 100vw, 576px"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </button>
             ))}

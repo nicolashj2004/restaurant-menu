@@ -9,6 +9,27 @@ export function groupByParent(categories: Category[]) {
   return { topLevel, childrenOf };
 }
 
+/**
+ * Deterministic shuffle seeded by a string (e.g. a product id). Looks random and
+ * varies from item to item, but — unlike Math.random() — gives the exact same
+ * order on the server render and the client hydration, so it can't cause a
+ * hydration mismatch.
+ */
+export function seededShuffle<T>(items: T[], seed: string): T[] {
+  let state = 0;
+  for (let i = 0; i < seed.length; i++) state = (state * 31 + seed.charCodeAt(i)) >>> 0;
+  const next = () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(next() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export function searchProducts(all: ProductWithRelations[], query: string): ProductWithRelations[] {
   const q = query.trim().toLowerCase();
   if (!q) return all;
@@ -27,15 +48,43 @@ export function searchProducts(all: ProductWithRelations[], query: string): Prod
   });
 }
 
+/**
+ * Picks up to `limit` other products, round-robining one per category per pass
+ * so the result spans every section instead of filling up with same-category
+ * items first (the product's own category still goes first each pass).
+ */
 export function getRelatedProducts(
   product: ProductWithRelations,
   all: ProductWithRelations[],
   limit = 6
 ): ProductWithRelations[] {
   const others = all.filter((p) => p.id !== product.id && p.is_available);
-  const sameCategory = others.filter((p) => p.category_id === product.category_id);
-  const rest = others.filter((p) => p.category_id !== product.category_id);
-  return [...sameCategory, ...rest].slice(0, limit);
+
+  const byCategory = new Map<string, ProductWithRelations[]>();
+  for (const p of others) {
+    const key = p.category_id ?? "";
+    const list = byCategory.get(key);
+    if (list) list.push(p);
+    else byCategory.set(key, [p]);
+  }
+
+  const categoryOrder = [...byCategory.keys()].sort((a, b) => {
+    if (a === product.category_id) return -1;
+    if (b === product.category_id) return 1;
+    return 0;
+  });
+
+  const result: ProductWithRelations[] = [];
+  for (let round = 0; result.length < limit; round++) {
+    const before = result.length;
+    for (const key of categoryOrder) {
+      const item = byCategory.get(key)?.[round];
+      if (item) result.push(item);
+      if (result.length >= limit) break;
+    }
+    if (result.length === before) break; // every category exhausted
+  }
+  return result;
 }
 
 export type QuickFilter =

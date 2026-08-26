@@ -44,7 +44,7 @@ export function ProductCard({
               fill
               priority={priority}
               sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 320px"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              className="object-contain transition-transform duration-500 ease-out group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-muted-foreground text-sm">

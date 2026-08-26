@@ -139,15 +139,13 @@ export function ImageManager({
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    setImages((prev) => {
-      const oldIndex = prev.findIndex((i) => i.id === active.id);
-      const newIndex = prev.findIndex((i) => i.id === over.id);
-      const next = [...prev];
-      const [moved] = next.splice(oldIndex, 1);
-      next.splice(newIndex, 0, moved);
-      reorderProductImagesAction(productId, next.map((i) => i.id));
-      return next;
-    });
+    const oldIndex = images.findIndex((i) => i.id === active.id);
+    const newIndex = images.findIndex((i) => i.id === over.id);
+    const next = [...images];
+    const [moved] = next.splice(oldIndex, 1);
+    next.splice(newIndex, 0, moved);
+    setImages(next);
+    reorderProductImagesAction(productId, next.map((i) => i.id));
   }
 
   return (
@@ -185,7 +183,7 @@ export function ImageManager({
       </div>
 
       {images.length > 0 && (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext id="product-images" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
             <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
               {images.map((image) => (
