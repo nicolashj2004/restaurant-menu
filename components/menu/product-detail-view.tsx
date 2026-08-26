@@ -107,7 +107,12 @@ export function ProductDetailView({ productSlug }: { productSlug: string }) {
           </p>
         )}
 
-        {product.description && <p className="mt-4 text-muted-foreground">{product.description}</p>}
+        {product.short_description && (
+          <p className="mt-4 font-medium text-foreground">{product.short_description}</p>
+        )}
+        {product.description && (
+          <p className="mt-2 whitespace-pre-line text-muted-foreground">{product.description}</p>
+        )}
 
         <div className="mt-3">
           <ShareButton title={product.name} text={product.short_description ?? undefined} />
