@@ -6,6 +6,7 @@ import { getActivePromotions } from "@/lib/services/promotions";
 import { RestaurantProvider } from "@/components/menu/restaurant-provider";
 import { QuickActionsBar } from "@/components/menu/quick-actions-bar";
 import { SiteFooter } from "@/components/menu/site-footer";
+import { ScrollToTopButton } from "@/components/menu/scroll-to-top-button";
 
 // Maps the Tipografía option chosen in Configuración (restaurant_settings.font_family) to
 // the CSS var of a font already preloaded in app/layout.tsx. Falls back to Inter for any
@@ -45,6 +46,7 @@ export default async function MenuLayout({ children }: { children: React.ReactNo
         <QuickActionsBar />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <ScrollToTopButton />
       </div>
     </RestaurantProvider>
   );

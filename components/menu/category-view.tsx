@@ -32,9 +32,9 @@ export function CategoryView({ categorySlug }: { categorySlug: string }) {
 
   return (
     <div className="mx-auto max-w-5xl pb-8">
-      <div className="px-4 pt-4 sm:px-0">
-        <CategoryNav />
-      </div>
+      {/* Same fix as app/menu/page.tsx: no snug wrapper div, so sticky has the room
+          (this outer max-w-5xl div) it needs to actually stay put on scroll. */}
+      <CategoryNav className="mt-4" />
 
       <div className="px-4 py-5 sm:px-0">
         <h1 className="font-category text-4xl">

@@ -19,7 +19,10 @@ export function CategoryNav({ className }: { className?: string }) {
     <nav
       aria-label="Categorías del menú"
       className={cn(
-        "sticky top-14 z-30 -mx-4 border-b bg-background/85 px-4 py-3 backdrop-blur-md sm:mx-0 sm:rounded-2xl sm:border",
+        // No -mx-4 bleed here: this now sits directly in an unpadded container (see
+        // app/menu/page.tsx and category-view.tsx), so plain full-width IS edge-to-edge
+        // already — a negative margin would push it past the viewport instead.
+        "sticky top-14 z-30 border-b bg-background/85 px-4 py-3 backdrop-blur-md sm:rounded-2xl sm:border",
         className
       )}
     >

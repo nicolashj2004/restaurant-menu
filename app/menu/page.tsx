@@ -27,9 +27,12 @@ export default function MenuHomePage() {
     <div className="pb-8">
       <Hero />
       <div className="mx-auto max-w-5xl">
-        <div className="px-4 pt-4 sm:px-0">
-          <CategoryNav />
-        </div>
+        {/* No wrapper div around CategoryNav — position: sticky is bounded by the height
+            of its *immediate* parent, and a div that only wraps this one short element
+            has no room for it to stick within, so it would just scroll away with the
+            page. This outer div (which spans the whole page's content) is the parent
+            it needs. */}
+        <CategoryNav className="mt-4" />
         <FeaturedCarousel />
         <ChefRecommendation />
         <PromotionsBanner />
