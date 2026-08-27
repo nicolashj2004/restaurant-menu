@@ -21,6 +21,7 @@ export function FiltersBar({
   onPriceRangeChange,
   maxPrice,
   formatPrice,
+  showQuickFilters = true,
 }: {
   activeFilter: QuickFilter | null;
   onFilterChange: (filter: QuickFilter | null) => void;
@@ -28,38 +29,42 @@ export function FiltersBar({
   onPriceRangeChange: (range: [number, number]) => void;
   maxPrice: number;
   formatPrice: (amount: number) => string;
+  /** Quick filter chips (Recomendados/Más vendidos/etc). Category pages hide these, keeping only the price slider. */
+  showQuickFilters?: boolean;
 }) {
   return (
     <div className="space-y-3 px-4 sm:px-0">
-      <div className="no-scrollbar flex gap-2 overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => onFilterChange(null)}
-          className={cn(
-            "shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
-            activeFilter === null
-              ? "border-transparent bg-foreground text-background"
-              : "border-border hover:bg-muted"
-          )}
-        >
-          Todo
-        </button>
-        {FILTERS.map((f) => (
+      {showQuickFilters && (
+        <div className="no-scrollbar flex gap-2 overflow-x-auto">
           <button
-            key={f.value}
             type="button"
-            onClick={() => onFilterChange(activeFilter === f.value ? null : f.value)}
+            onClick={() => onFilterChange(null)}
             className={cn(
               "shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
-              activeFilter === f.value
+              activeFilter === null
                 ? "border-transparent bg-foreground text-background"
                 : "border-border hover:bg-muted"
             )}
           >
-            {f.label}
+            Todo
           </button>
-        ))}
-      </div>
+          {FILTERS.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => onFilterChange(activeFilter === f.value ? null : f.value)}
+              className={cn(
+                "shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+                activeFilter === f.value
+                  ? "border-transparent bg-foreground text-background"
+                  : "border-border hover:bg-muted"
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {maxPrice > 0 && (
         <div className="flex items-center gap-3 pt-1">
