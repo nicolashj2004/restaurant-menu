@@ -32,13 +32,13 @@ export function MenuByCategory() {
           if (directItems.length === 0 && childSections.length === 0) return null;
           return (
             <div key={category.id} id={category.slug}>
-              <h3 className="mb-3 px-4 font-heading text-lg font-semibold sm:px-0">
+              <h3 className="mb-3 px-4 font-category text-2xl sm:px-0">
                 {category.icon} {category.name}
               </h3>
               {directItems.length > 0 && <ProductGrid products={directItems} />}
               {childSections.map(({ child, items }) => (
                 <div key={child.id} id={child.slug} className="mt-6 pl-4 sm:pl-6">
-                  <h4 className="mb-3 px-4 font-heading text-base font-semibold sm:px-0">
+                  <h4 className="mb-3 px-4 font-category text-xl sm:px-0">
                     {child.icon} {child.name}
                   </h4>
                   <ProductGrid products={items} />

@@ -48,7 +48,9 @@ export function Hero() {
             {restaurant.name}
           </h1>
           {settings?.tagline && (
-            <p className="mt-3 max-w-lg text-base text-white/85 sm:text-lg">{settings.tagline}</p>
+            <p className="mt-3 max-w-lg whitespace-pre-line text-base text-white/85 sm:text-lg">
+              {settings.tagline}
+            </p>
           )}
 
           <div className="mt-6 flex flex-wrap gap-2.5">

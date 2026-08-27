@@ -60,19 +60,28 @@ export function SiteFooter() {
             {settings?.address && (
               <div className="flex gap-2 text-sm">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                <div>
-                  <p>{settings.address}</p>
-                  {settings.google_maps_url && (
-                    <a
-                      href={settings.google_maps_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-[color:var(--restaurant-accent)] underline underline-offset-2"
-                    >
-                      Ver en Google Maps
-                    </a>
-                  )}
-                </div>
+                {/* One line per location (see SettingsForm) — each gets its own Google Maps
+                    search link, generated from the address text itself rather than a single
+                    manually-configured URL that couldn't point at more than one place. */}
+                <ul className="space-y-2">
+                  {settings.address
+                    .split("\n")
+                    .map((line) => line.trim())
+                    .filter(Boolean)
+                    .map((line) => (
+                      <li key={line}>
+                        <p>{line}</p>
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(line)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[color:var(--restaurant-accent)] underline underline-offset-2"
+                        >
+                          Ver en Google Maps
+                        </a>
+                      </li>
+                    ))}
+                </ul>
               </div>
             )}
             {settings?.opening_hours && (

@@ -10,6 +10,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading);
+  --font-category: var(--font-category);
   --color-restaurant-primary: var(--restaurant-primary);
   --color-restaurant-accent: var(--restaurant-accent);
   --color-sidebar-ring: var(--sidebar-ring);

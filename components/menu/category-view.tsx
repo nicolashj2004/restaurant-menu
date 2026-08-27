@@ -37,7 +37,7 @@ export function CategoryView({ categorySlug }: { categorySlug: string }) {
       </div>
 
       <div className="px-4 py-5 sm:px-0">
-        <h1 className="font-heading text-3xl font-bold">
+        <h1 className="font-category text-4xl">
           {category.icon} {category.name}
         </h1>
         {category.description && <p className="mt-1 text-muted-foreground">{category.description}</p>}
@@ -73,7 +73,7 @@ export function CategoryView({ categorySlug }: { categorySlug: string }) {
                 if (childItems.length === 0) return null;
                 return (
                   <div key={child.id} id={child.slug} className="pl-4 sm:pl-6">
-                    <h3 className="mb-3 px-4 font-heading text-lg font-semibold sm:px-0">
+                    <h3 className="mb-3 px-4 font-category text-2xl sm:px-0">
                       {child.icon} {child.name}
                     </h3>
                     <div className="grid grid-cols-2 gap-3 px-4 sm:grid-cols-3 sm:px-0 lg:grid-cols-4">

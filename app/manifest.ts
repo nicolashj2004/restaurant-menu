@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Menú Digital — Sabor Urbano",
-    short_name: "Sabor Urbano",
-    description: "Menú digital premium e interactivo de Sabor Urbano.",
+    name: "Menú Digital — Mi Leña",
+    short_name: "Mi Leña",
+    description: "Menú digital premium e interactivo de Mi Leña.",
     start_url: "/menu",
     display: "standalone",
     background_color: "#0a0a0a",

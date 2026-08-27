@@ -58,7 +58,7 @@ export function SettingsForm({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="tagline">Mensaje corto (tagline)</Label>
-            <Input id="tagline" name="tagline" defaultValue={settings?.tagline ?? ""} maxLength={160} />
+            <Textarea id="tagline" name="tagline" rows={2} defaultValue={settings?.tagline ?? ""} maxLength={160} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="description">Descripción</Label>
@@ -159,11 +159,17 @@ export function SettingsForm({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="address">Dirección</Label>
-            <Input id="address" name="address" defaultValue={settings?.address ?? ""} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="google_maps_url">Enlace de Google Maps</Label>
-            <Input id="google_maps_url" name="google_maps_url" defaultValue={settings?.google_maps_url ?? ""} />
+            <Textarea
+              id="address"
+              name="address"
+              rows={2}
+              placeholder={"Una sede por línea, ej.:\nCra. 78 #7D-12, Kennedy, Bogotá\nCra. 58 #128-84, Bogotá"}
+              defaultValue={settings?.address ?? ""}
+            />
+            <p className="text-xs text-muted-foreground">
+              Si el restaurante tiene más de una sede, escribe cada dirección en su propia línea — el pie de
+              página genera automáticamente un enlace de Google Maps para cada una.
+            </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
