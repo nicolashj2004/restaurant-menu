@@ -8,6 +8,7 @@ export const categoryFormSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Usa solo minúsculas, números y guiones"),
   description: z.string().max(300),
   icon: z.string().max(8),
+  image_url: z.string().nullable(),
   is_active: z.boolean(),
   parent_id: z.string().uuid().nullable(),
 });

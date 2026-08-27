@@ -10,10 +10,12 @@ export function CategoryNav({ className }: { className?: string }) {
   const pathname = usePathname();
   const activeSlug = pathname.startsWith("/menu/") ? pathname.split("/")[2] : undefined;
 
-  const items = [
-    { slug: undefined, name: "Todo", icon: "🍽" },
-    ...categories.filter((c) => c.parent_id === null).map((c) => ({ slug: c.slug, name: c.name, icon: c.icon })),
-  ];
+  // No "Todo" entry — the home page (/menu) is now the category-picker landing page,
+  // not an "everything at once" view, so this nav is purely for switching between
+  // categories while already inside one.
+  const items = categories
+    .filter((c) => c.parent_id === null)
+    .map((c) => ({ slug: c.slug, name: c.name, icon: c.icon }));
 
   return (
     <nav
@@ -28,12 +30,11 @@ export function CategoryNav({ className }: { className?: string }) {
     >
       <div className="no-scrollbar flex gap-2 overflow-x-auto scroll-px-4">
         {items.map((item) => {
-          const isActive = item.slug === activeSlug || (!item.slug && !activeSlug);
-          const href = item.slug ? `/menu/${item.slug}` : "/menu";
+          const isActive = item.slug === activeSlug;
           return (
             <Link
-              key={item.slug ?? "all"}
-              href={href}
+              key={item.slug}
+              href={`/menu/${item.slug}`}
               className={cn(
                 "flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                 isActive
