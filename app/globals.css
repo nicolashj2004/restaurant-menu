@@ -86,6 +86,9 @@
   --sidebar-ring: oklch(0.708 0 0);
   --restaurant-primary: #171717;
   --restaurant-accent: #d97706;
+  /* Default body font (admin/login always use this; the public menu overrides it
+     per-restaurant in app/menu/layout.tsx based on restaurant_settings.font_family). */
+  --font-sans: var(--font-inter);
 }
 
 .dark {
