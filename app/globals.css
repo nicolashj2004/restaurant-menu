@@ -99,9 +99,8 @@
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
-  --background-gradient: radial-gradient(ellipse 70% 50% at 15% -10%, oklch(0.28 0.06 45 / 0.55), transparent 60%),
-    radial-gradient(ellipse 60% 45% at 100% 5%, oklch(0.24 0.05 30 / 0.5), transparent 55%),
-    radial-gradient(ellipse 90% 55% at 50% 115%, oklch(0.2 0.03 20 / 0.55), transparent 60%);
+  /* No --background-gradient override here — dark mode's body background is the photo
+     set directly on `.dark body` below, not this radial-gradient recipe (light mode only). */
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -142,6 +141,16 @@
     background-color: var(--background);
     background-image: var(--background-gradient);
     background-attachment: fixed;
+  }
+  /* Dark mode uses the restaurant's own textured background photo instead of the
+     plain radial glow — a light darkening wash under it keeps body-level text (outside
+     opaque cards) readable. Light mode keeps the softer gradient: this photo is too
+     somber to sit behind a light-themed page. */
+  .dark body {
+    background-image: linear-gradient(oklch(0.06 0 0 / 0.6), oklch(0.06 0 0 / 0.6)), url("/backgrounds/page-bg.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
   html {
     @apply font-sans;
