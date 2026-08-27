@@ -5,11 +5,14 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useMenu } from "@/components/menu/restaurant-provider";
 import { SectionHeading } from "@/components/menu/section-heading";
+import { applyDiscount, getActiveDiscount } from "@/lib/menu-utils";
 
 export function ChefRecommendation() {
-  const { products, formatPrice } = useMenu();
+  const { products, promotions, formatPrice } = useMenu();
   const dish = products.find((p) => p.is_chef_recommendation && p.is_available);
   if (!dish) return null;
+
+  const discount = getActiveDiscount(dish.id, promotions);
 
   const image = dish.images.find((i) => i.is_primary) ?? dish.images[0];
   const href = `/menu/${dish.category?.slug ?? "producto"}/${dish.slug}`;
@@ -46,7 +49,21 @@ export function ChefRecommendation() {
               {dish.short_description && (
                 <p className="mt-2 max-w-md text-white/85">{dish.short_description}</p>
               )}
-              <p className="mt-4 text-xl font-semibold">{formatPrice(dish.price)}</p>
+              {discount ? (
+                <p className="mt-4 flex flex-wrap items-baseline gap-2 text-xl font-semibold">
+                  <span className="text-sm text-white/70 line-through">{formatPrice(dish.price)}</span>
+                  <span className="text-2xl font-extrabold text-rose-400">
+                    {formatPrice(applyDiscount(dish.price, discount))}
+                  </span>
+                  {discount.type === "percentage" && (
+                    <span className="rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      -{discount.value}%
+                    </span>
+                  )}
+                </p>
+              ) : (
+                <p className="mt-4 text-xl font-semibold">{formatPrice(dish.price)}</p>
+              )}
             </div>
           </Link>
         </motion.div>

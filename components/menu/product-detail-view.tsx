@@ -5,18 +5,45 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useMenu } from "@/components/menu/restaurant-provider";
 import { ProductGallery } from "@/components/menu/product-gallery";
+import { Product360Viewer } from "@/components/menu/product-360-viewer";
 import { ProductBadges } from "@/components/menu/product-badges";
 import { ProductOptions } from "@/components/menu/product-options";
 import { FavoriteButton } from "@/components/menu/favorite-button";
 import { ShareButton } from "@/components/menu/share-button";
 import { RelatedProducts } from "@/components/menu/related-products";
-import { getRelatedProducts, groupByParent, seededShuffle } from "@/lib/menu-utils";
+import { PriceDisplay } from "@/components/menu/price-display";
+import { applyDiscount, getActiveDiscount, getRelatedProducts, groupByParent, seededShuffle } from "@/lib/menu-utils";
+import type { ProductWithRelations } from "@/lib/types/domain";
 
 /** Categories (by slug) treated as pairing suggestions in "Combínala con". */
 const COMBINE_WITH_SLUGS = ["entradas", "bebidas"];
 
+/**
+ * Ordered 360° frame URLs for a dish, if it has any (e.g. 01.webp, 02.webp, ...).
+ * No product currently has a 360 photo sequence — there's no admin upload flow or
+ * database field for one yet. Once that source exists (a dedicated column, a naming
+ * convention on product_images, a separate table — whatever fits), return its ordered
+ * URLs here. Product360Viewer itself needs no changes to support it.
+ */
+// 127.0.0.1 only resolves to "this machine" — using the LAN IP instead so the demo
+// also loads images from a phone on the same Wi-Fi, not just this Mac.
+const MOUSE_360_TEST_FRAMES = Array.from(
+  { length: 18 },
+  (_, i) =>
+    `http://192.168.5.228:54321/storage/v1/object/public/menu-images/32a2a05e-54bd-4002-96c1-065f857491bb/360-test/${String(i + 1).padStart(2, "0")}.jpg`
+);
+
+function get360Images(product: ProductWithRelations): string[] {
+  // TEMPORAL — secuencia real de 18 fotos (de un mouse, solo para probar el visor en
+  // vivo). Se quita apenas confirmes que lo viste; no es la integración final.
+  if (product.slug === "volcan-de-chocolate") {
+    return MOUSE_360_TEST_FRAMES;
+  }
+  return [];
+}
+
 export function ProductDetailView({ productSlug }: { productSlug: string }) {
-  const { products, categories, formatPrice, track } = useMenu();
+  const { products, categories, promotions, formatPrice, track } = useMenu();
   const product = products.find((p) => p.slug === productSlug);
 
   useEffect(() => {
@@ -35,6 +62,10 @@ export function ProductDetailView({ productSlug }: { productSlug: string }) {
       </div>
     );
   }
+
+  const discount = getActiveDiscount(product.id, promotions);
+  const effectivePrice = applyDiscount(product.price, discount);
+  const threeSixtyImages = get360Images(product);
 
   const related = getRelatedProducts(product, products, 8);
 
@@ -95,8 +126,8 @@ export function ProductDetailView({ productSlug }: { productSlug: string }) {
         <div className="flex items-start justify-between gap-4">
           <h1 className="font-heading text-3xl font-bold leading-tight text-balance">{product.name}</h1>
         </div>
-        <p className="mt-2 text-2xl font-semibold text-[color:var(--restaurant-accent)]">
-          {formatPrice(product.price)}
+        <p className="mt-2 text-2xl font-semibold">
+          <PriceDisplay price={product.price} discount={discount} formatPrice={formatPrice} />
         </p>
 
         <ProductBadges tags={product.tags} spiceLevel={product.spice_level} className="mt-3" />
@@ -117,6 +148,16 @@ export function ProductDetailView({ productSlug }: { productSlug: string }) {
         <div className="mt-3">
           <ShareButton title={product.name} text={product.short_description ?? undefined} />
         </div>
+
+        {threeSixtyImages.length > 0 && (
+          <div className="mt-6">
+            <h2 className="font-heading text-base font-semibold">Vista 360°</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Arrastra para girar el plato</p>
+            <div className="mt-2">
+              <Product360Viewer images={threeSixtyImages} alt={`${product.name} — vista 360°`} />
+            </div>
+          </div>
+        )}
 
         {product.ingredients.length > 0 && (
           <div className="mt-6">
@@ -145,7 +186,7 @@ export function ProductDetailView({ productSlug }: { productSlug: string }) {
 
         {product.options.length > 0 && (
           <div className="mt-8">
-            <ProductOptions options={product.options} basePrice={product.price} formatPrice={formatPrice} />
+            <ProductOptions options={product.options} basePrice={effectivePrice} formatPrice={formatPrice} />
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-import type { Tables, AdminRole, OpeningHours, ProductStatus, PromotionStatus, PromotionDisplayType, OptionSelectionType } from "@/lib/types/database";
+import type { Tables, AdminRole, OpeningHours, ProductStatus, PromotionStatus, PromotionDisplayType, PromotionDiscountType, OptionSelectionType } from "@/lib/types/database";
 
 export type Restaurant = Tables<"restaurants">;
 export type RestaurantSettings = Omit<Tables<"restaurant_settings">, "opening_hours"> & {
@@ -14,9 +14,10 @@ export type ProductOption = Omit<Tables<"product_options">, "selection_type"> & 
   selection_type: OptionSelectionType;
 };
 export type OptionValue = Tables<"option_values">;
-export type Promotion = Omit<Tables<"promotions">, "status" | "display_type"> & {
+export type Promotion = Omit<Tables<"promotions">, "status" | "display_type" | "discount_type"> & {
   status: PromotionStatus;
   display_type: PromotionDisplayType;
+  discount_type: PromotionDiscountType | null;
 };
 export type RestaurantAdmin = Omit<Tables<"restaurant_admins">, "role"> & { role: AdminRole };
 

@@ -50,12 +50,15 @@ export async function getAllPromotionsForAdmin(
 export interface PromotionInput {
   restaurant_id: string;
   title: string;
+  slug: string;
   description: string;
   image_url: string | null;
   starts_at: string | null;
   ends_at: string | null;
   status: Promotion["status"];
   display_type: Promotion["display_type"];
+  discount_type: Promotion["discount_type"];
+  discount_value: number | null;
 }
 
 export async function createPromotion(
@@ -66,9 +69,10 @@ export async function createPromotion(
   const { data, error } = await supabase.from("promotions").insert(input).select().single();
   if (error) throw error;
   if (productIds.length) {
-    await supabase
+    const { error: linkError } = await supabase
       .from("promotion_products")
       .insert(productIds.map((product_id) => ({ promotion_id: data.id, product_id })));
+    if (linkError) throw linkError;
   }
   return data as unknown as Promotion;
 }
@@ -88,11 +92,13 @@ export async function updatePromotion(
   if (error) throw error;
 
   if (productIds) {
-    await supabase.from("promotion_products").delete().eq("promotion_id", id);
+    const { error: deleteError } = await supabase.from("promotion_products").delete().eq("promotion_id", id);
+    if (deleteError) throw deleteError;
     if (productIds.length) {
-      await supabase
+      const { error: linkError } = await supabase
         .from("promotion_products")
         .insert(productIds.map((product_id) => ({ promotion_id: id, product_id })));
+      if (linkError) throw linkError;
     }
   }
   return data as unknown as Promotion;

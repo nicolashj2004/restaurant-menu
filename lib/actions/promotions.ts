@@ -15,12 +15,15 @@ async function requireSession() {
 function parsePromotionForm(formData: FormData) {
   return promotionFormSchema.parse({
     title: formData.get("title"),
+    slug: formData.get("slug"),
     description: formData.get("description") ?? "",
     image_url: formData.get("image_url") || null,
     starts_at: formData.get("starts_at") || null,
     ends_at: formData.get("ends_at") || null,
     status: formData.get("status"),
     display_type: formData.get("display_type"),
+    discount_type: formData.get("discount_type") ?? "none",
+    discount_value: Number(formData.get("discount_value") ?? 0),
     product_ids: JSON.parse(String(formData.get("product_ids") ?? "[]")),
   });
 }
@@ -32,12 +35,15 @@ export async function createPromotionAction(formData: FormData) {
     {
       restaurant_id: session.restaurantId,
       title: values.title,
+      slug: values.slug,
       description: values.description,
       image_url: values.image_url ?? null,
       starts_at: values.starts_at ?? null,
       ends_at: values.ends_at ?? null,
       status: values.status,
       display_type: values.display_type,
+      discount_type: values.discount_type === "none" ? null : values.discount_type,
+      discount_value: values.discount_type === "none" ? null : values.discount_value,
     },
     values.product_ids
   );
@@ -53,12 +59,15 @@ export async function updatePromotionAction(promotionId: string, formData: FormD
     promotionId,
     {
       title: values.title,
+      slug: values.slug,
       description: values.description,
       image_url: values.image_url ?? null,
       starts_at: values.starts_at ?? null,
       ends_at: values.ends_at ?? null,
       status: values.status,
       display_type: values.display_type,
+      discount_type: values.discount_type === "none" ? null : values.discount_type,
+      discount_value: values.discount_type === "none" ? null : values.discount_value,
     },
     values.product_ids
   );

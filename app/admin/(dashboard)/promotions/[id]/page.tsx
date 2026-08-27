@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getAdminSession } from "@/lib/services/admin-auth";
 import { getAllProductsForAdmin } from "@/lib/services/products";
 import { getAllPromotionsForAdmin } from "@/lib/services/promotions";
+import { getRestaurantSettings } from "@/lib/services/restaurant";
 import { PromotionForm } from "@/components/admin/promotion-form";
 
 interface PageProps {
@@ -16,9 +17,10 @@ export const metadata: Metadata = { title: "Editar promoción — Panel administ
 export default async function EditPromotionPage({ params }: PageProps) {
   const { id } = await params;
   const session = await getAdminSession();
-  const [promotions, products] = await Promise.all([
+  const [promotions, products, settings] = await Promise.all([
     getAllPromotionsForAdmin(session!.restaurantId),
     getAllProductsForAdmin(session!.restaurantId),
+    getRestaurantSettings(session!.restaurantId),
   ]);
   const promotion = promotions.find((p) => p.id === id);
   if (!promotion) notFound();
@@ -30,7 +32,12 @@ export default async function EditPromotionPage({ params }: PageProps) {
       </Link>
       <h1 className="font-heading text-2xl font-bold sm:text-3xl">{promotion.title}</h1>
       <div className="mt-6">
-        <PromotionForm promotion={promotion} products={products.map((p) => ({ id: p.id, name: p.name }))} />
+        <PromotionForm
+          promotion={promotion}
+          products={products.map((p) => ({ id: p.id, name: p.name, price: p.price }))}
+          currency={settings?.currency ?? "COP"}
+          locale={settings?.locale ?? "es"}
+        />
       </div>
     </div>
   );

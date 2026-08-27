@@ -7,6 +7,8 @@ import type { ProductWithRelations } from "@/lib/types/domain";
 import { useMenu } from "@/components/menu/restaurant-provider";
 import { FavoriteButton } from "@/components/menu/favorite-button";
 import { ProductBadges } from "@/components/menu/product-badges";
+import { PriceDisplay } from "@/components/menu/price-display";
+import { getActiveDiscount } from "@/lib/menu-utils";
 import { cn } from "@/lib/utils";
 
 export function ProductCard({
@@ -18,9 +20,10 @@ export function ProductCard({
   priority?: boolean;
   className?: string;
 }) {
-  const { formatPrice, track } = useMenu();
+  const { formatPrice, track, promotions } = useMenu();
   const primaryImage = product.images.find((i) => i.is_primary) ?? product.images[0];
   const href = `/menu/${product.category?.slug ?? "producto"}/${product.slug}`;
+  const discount = getActiveDiscount(product.id, promotions);
 
   return (
     <motion.div
@@ -78,8 +81,8 @@ export function ProductCard({
           {product.short_description && (
             <p className="line-clamp-2 text-sm text-muted-foreground">{product.short_description}</p>
           )}
-          <div className="mt-auto pt-2 text-base font-semibold text-[color:var(--restaurant-accent)]">
-            {formatPrice(product.price)}
+          <div className="mt-auto pt-2 text-base font-semibold">
+            <PriceDisplay price={product.price} discount={discount} formatPrice={formatPrice} />
           </div>
         </div>
       </Link>

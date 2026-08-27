@@ -511,11 +511,14 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          discount_type: string | null
+          discount_value: number | null
           display_type: string
           ends_at: string | null
           id: string
           image_url: string | null
           restaurant_id: string
+          slug: string | null
           starts_at: string | null
           status: string
           title: string
@@ -524,11 +527,14 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
           display_type?: string
           ends_at?: string | null
           id?: string
           image_url?: string | null
           restaurant_id: string
+          slug?: string | null
           starts_at?: string | null
           status?: string
           title: string
@@ -537,11 +543,14 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
           display_type?: string
           ends_at?: string | null
           id?: string
           image_url?: string | null
           restaurant_id?: string
+          slug?: string | null
           starts_at?: string | null
           status?: string
           title?: string
@@ -873,6 +882,7 @@ export const Constants = {
 export type ProductStatus = "draft" | "published" | "archived";
 export type PromotionStatus = "draft" | "active" | "expired";
 export type PromotionDisplayType = "banner" | "carousel" | "popup" | "card";
+export type PromotionDiscountType = "percentage" | "fixed_amount";
 export type OptionSelectionType = "single" | "multiple";
 export type AdminRole = "owner" | "admin" | "staff";
 export type ThemeMode = "light" | "dark" | "system";

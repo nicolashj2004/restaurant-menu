@@ -1,6 +1,38 @@
-import type { Category, ProductWithRelations, RestaurantSettings } from "@/lib/types/domain";
+import type { Category, ProductWithRelations, PromotionWithProducts, RestaurantSettings } from "@/lib/types/domain";
 
 /** Pure, client-safe helpers shared between server and client menu components. */
+
+export interface ProductDiscount {
+  type: "percentage" | "fixed_amount";
+  value: number;
+  promotionTitle: string;
+  promotionSlug: string | null;
+}
+
+/** First active promotion (already filtered by getActivePromotions) that discounts this product, if any. */
+export function getActiveDiscount(
+  productId: string,
+  promotions: PromotionWithProducts[]
+): ProductDiscount | null {
+  const promo = promotions.find(
+    (p) => p.discount_type && p.discount_value && p.products.some((prod) => prod.id === productId)
+  );
+  if (!promo || !promo.discount_type || !promo.discount_value) return null;
+  return {
+    type: promo.discount_type,
+    value: promo.discount_value,
+    promotionTitle: promo.title,
+    promotionSlug: promo.slug,
+  };
+}
+
+/** Applies a discount to a price, clamped to never go below 0. */
+export function applyDiscount(price: number, discount: ProductDiscount | null): number {
+  if (!discount) return price;
+  const discounted =
+    discount.type === "percentage" ? price * (1 - discount.value / 100) : price - discount.value;
+  return Math.max(0, Math.round(discounted));
+}
 
 /** Splits a flat category list into top-level categories and a lookup of each one's children (one level deep). */
 export function groupByParent(categories: Category[]) {

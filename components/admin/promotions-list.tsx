@@ -45,6 +45,11 @@ export function PromotionsList({ promotions }: { promotions: PromotionWithProduc
             <p className="truncate text-sm text-muted-foreground">{promo.products.length} productos relacionados</p>
           </div>
           <Badge variant="outline">{STATUS_LABEL[promo.status]}</Badge>
+          {promo.discount_type && promo.discount_value && (
+            <Badge className="bg-rose-600 text-white hover:bg-rose-600">
+              {promo.discount_type === "percentage" ? `${promo.discount_value}% OFF` : `-${promo.discount_value}`}
+            </Badge>
+          )}
           <Button asChild variant="outline" size="sm">
             <Link href={`/admin/promotions/${promo.id}`}>Editar</Link>
           </Button>
