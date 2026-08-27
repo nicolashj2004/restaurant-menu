@@ -89,11 +89,19 @@
   /* Default body font (admin/login always use this; the public menu overrides it
      per-restaurant in app/menu/layout.tsx based on restaurant_settings.font_family). */
   --font-sans: var(--font-inter);
+  /* Soft ambient glow instead of a flat page background — subtle in light mode, warmer
+     and moodier in dark. Cards/popovers stay flat (their own --card token, untouched). */
+  --background-gradient: radial-gradient(ellipse 70% 45% at 15% -10%, oklch(0.94 0.03 55 / 0.7), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 10%, oklch(0.95 0.025 40 / 0.6), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 50% 115%, oklch(0.93 0.02 250 / 0.4), transparent 60%);
 }
 
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
+  --background-gradient: radial-gradient(ellipse 70% 50% at 15% -10%, oklch(0.28 0.06 45 / 0.55), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 100% 5%, oklch(0.24 0.05 30 / 0.5), transparent 55%),
+    radial-gradient(ellipse 90% 55% at 50% 115%, oklch(0.2 0.03 20 / 0.55), transparent 60%);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -130,7 +138,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: var(--background);
+    background-image: var(--background-gradient);
+    background-attachment: fixed;
   }
   html {
     @apply font-sans;
