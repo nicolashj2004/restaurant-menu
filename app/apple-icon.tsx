@@ -1,11 +1,24 @@
 import { ImageResponse } from "next/og";
+import { getCurrentRestaurant, getRestaurantSettings } from "@/lib/services/restaurant";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-export default function AppleIcon() {
+export default async function AppleIcon() {
+  const restaurant = await getCurrentRestaurant();
+  const settings = restaurant ? await getRestaurantSettings(restaurant.id) : null;
+
   return new ImageResponse(
-    (
+    settings?.favicon_url ? (
+      // Rendered by Satori (ImageResponse) server-side, not the browser — next/image doesn't apply here.
+      <img
+        src={settings.favicon_url}
+        width={size.width}
+        height={size.height}
+        style={{ objectFit: "cover" }}
+        alt=""
+      />
+    ) : (
       <div
         style={{
           width: "100%",
@@ -20,7 +33,7 @@ export default function AppleIcon() {
           fontFamily: "serif",
         }}
       >
-        S
+        {restaurant?.name?.trim().charAt(0).toUpperCase() || "M"}
       </div>
     ),
     { ...size }

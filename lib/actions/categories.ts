@@ -23,6 +23,7 @@ function parseCategoryForm(formData: FormData) {
     slug: formData.get("slug"),
     description: formData.get("description") ?? "",
     icon: formData.get("icon") ?? "",
+    image_url: formData.get("image_url") || null,
     is_active: formData.get("is_active") === "on",
     parent_id: !parentId || parentId === "none" ? null : parentId,
   });

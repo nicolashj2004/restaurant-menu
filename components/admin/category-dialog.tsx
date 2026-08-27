@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { SingleImageUploader } from "@/components/admin/single-image-uploader";
 import {
   Select,
   SelectContent,
@@ -47,6 +48,7 @@ export function CategoryDialog({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [slugTouched, setSlugTouched] = useState(Boolean(category));
+  const [imageUrl, setImageUrl] = useState<string | null>(category?.image_url ?? null);
 
   const hasChildren = category ? categories.some((c) => c.parent_id === category.id) : false;
   const parentOptions = categories.filter((c) => c.parent_id === null && c.id !== category?.id);
@@ -77,6 +79,7 @@ export function CategoryDialog({
       // call above, not a reaction to reactive props.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSlugTouched(Boolean(category));
+      setImageUrl(category?.image_url ?? null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, category?.id]);
@@ -87,6 +90,7 @@ export function CategoryDialog({
     formData.set("slug", values.slug);
     formData.set("description", values.description);
     formData.set("icon", values.icon);
+    formData.set("image_url", imageUrl ?? "");
     formData.set("parent_id", values.parent_id ?? "none");
     if (values.is_active) formData.set("is_active", "on");
 
@@ -141,6 +145,14 @@ export function CategoryDialog({
           <div className="space-y-1.5">
             <Label htmlFor="cat-description">Descripción (opcional)</Label>
             <Textarea id="cat-description" rows={2} {...form.register("description")} />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Foto (opcional)</Label>
+            <SingleImageUploader folder="categories" value={imageUrl} onChange={setImageUrl} aspect="aspect-video" />
+            <p className="text-xs text-muted-foreground">
+              Se usa como portada de esta categoría en el inicio del menú. Sin foto, se muestra un color en su lugar.
+            </p>
           </div>
 
           {hasChildren ? (
